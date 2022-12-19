@@ -472,10 +472,16 @@ class FECConv(object):
 
         # *** BEGIN PATCH ***
         # Estimate the bits that would have otherwise been truncated.
-        for i in range(0, self.decision_depth):
+        # print(self.paths.cumulative_metric, flush=True)
+        # print(self.paths.traceback_bits, flush=True)
+        traceback_bits = self.paths.traceback_bits
+        for i in range(1, self.decision_depth):
             min_metric = min(self.paths.cumulative_metric[:, i])
             min_idx = np.where(self.paths.cumulative_metric[:, i] == min_metric)
-            y[k+i] = self.paths.traceback_bits[min_idx[0][0],-1]
+            # print(min_metric, min_idx, flush=True)
+            # print(self.paths.traceback_bits[min_idx[0][0],-(i+1)], flush=True)
+            traceback_bits = traceback_bits[:, :-1]
+            y[k+i-1] = traceback_bits[min_idx[0][0], -1]
         # Trim the output to the correct length.
         y = y[:k+self.decision_depth-1]
         # *** END PATCH ***
