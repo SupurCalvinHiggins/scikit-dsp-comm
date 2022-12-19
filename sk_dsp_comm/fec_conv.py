@@ -469,11 +469,16 @@ class FECConv(object):
             if n >= symbolL*self.decision_depth-symbolL:  # 2 since Rate = 1/2
                 y[k] = self.paths.traceback_bits[min_idx[0][0],-1]
                 k += 1
+
+        # *** BEGIN PATCH ***
+        # Estimate the bits that would have otherwise been truncated.
         for i in range(0, self.decision_depth):
             min_metric = min(self.paths.cumulative_metric[:, i])
             min_idx = np.where(self.paths.cumulative_metric[:, i] == min_metric)
             y[k+i] = self.paths.traceback_bits[min_idx[0][0],-1]
-        y = y[:k+self.decision_depth-1] # trim final length
+        # Trim the output to the correct length.
+        y = y[:k+self.decision_depth-1]
+        # *** END PATCH ***
         return y
 
     def bm_calc(self,ref_code_bits, rec_code_bits, metric_type, quant_level):
